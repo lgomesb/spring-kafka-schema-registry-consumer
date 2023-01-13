@@ -1,0 +1,37 @@
+spring:
+  application:
+    name: "${APPLICATION_NAME:spring-kafka-schema-registry-consumer}"
+  kafka:
+    bootstrap-servers:
+      - ${BOOTSTRAP_SERVER:http://localhost:9092}
+    properties:
+      request:
+        timeout.ms: 20000
+      retry:
+        backoff.ms: 500
+    #   auto.register.schemas: true
+
+      schema.registry:
+        url: ${SCHEMA_REGISTRY:http://localhost:8081/}
+        
+      # Delegate deserializers
+      spring.deserializer.key.delegate.class: org.apache.kafka.common.serialization.StringDeserializer
+      spring.deserializer.value.delegate.class: io.confluent.kafka.serializers.KafkaAvroDeserializer
+      
+    consumer:
+      group-id: ${GROUP_ID:group-test-registry}
+
+      # Configures the Spring Kafka ErrorHandlingDeserializer that delegates to the 'real' deserializers
+      key-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      request.timeout.ms: 2000
+      specific.avro.reader: false
+
+    logging:
+      level:
+        root: info
+
+app:
+    kafka:
+        consumer:
+            topic: taxpayer-avro-topic
